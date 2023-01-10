@@ -8,11 +8,13 @@ services:
         - 5672:5672
         - 15672:15672
     volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+        - rabbit-data:/var/lib/rabbitmq/
+        - rabbit-log:/var/log/rabbitmq/
     networks:
         - mm_2023
-
+volumes:
+  rabbit-data:
+  rabbit-log:
 networks:
   mm_2023:
     name: mm_2023
