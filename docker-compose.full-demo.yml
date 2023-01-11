@@ -4,6 +4,8 @@ services:
     image: rabbitmq:3.11.4-management-alpine
     container_name: 'rabbitmq'
     hostname: microservices_march
+    depends_on:
+      - load_balancer
     ports:
         - 5672:5672
         - 15672:15672
@@ -12,7 +14,6 @@ services:
         - rabbit-log:/var/log/rabbitmq/
     networks:
         - mm_2023
-        
   load_balancer:
     image: nginx:1.23
     volumes:
@@ -24,6 +25,8 @@ services:
       - NGINX_PORT=80
     networks:
         - mm_2023
+        
+
 volumes:
   rabbit-data:
   rabbit-log:
