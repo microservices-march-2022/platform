@@ -131,7 +131,7 @@ Then, from each cloned repository, run:
 docker-compose down
 ```
 
-And finally, to remove any potentially dangling images, run once:
+And optionally, to remove any potentially dangling images, run:
 
 ```bash
 docker rmi $(docker images -f dangling=true -aq)
