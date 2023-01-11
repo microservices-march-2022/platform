@@ -15,7 +15,7 @@ Make sure you have this repo as well as the following additional repos checked o
 
 ### Start the Shared Platform Infrastructure
 
-From this repo, run:
+From this repository, run:
 
 ```bash
 docker-compose up -d
@@ -122,10 +122,10 @@ Message queues are an important tool in microservices architectures to allow us 
 Once you are done playing with this microservices demo architecture, to remove all running and dangling containers, run:
 
 ```bash
-docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+docker stop messenger notifier && docker rm messenger notifier
 ```
 
-Then, from this repo, run:
+Then, from each cloned repository, run:
 
 ```bash
 docker-compose down
