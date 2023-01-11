@@ -1,39 +1,138 @@
-# Platform
-Shared infrastructure for the Microservice March demo architecture
+# Microservices March Demo Architecture Platform (WIP)
 
-## Usage (WIP)
-The aim is to set things up as manually as possible without creating "magic" via docker compose or involving something heavy like kubernetes.  Future iterations will have examples of those setups
+Shared infrastructure for the Microservices March demo architecture.
 
-### Build Containers
-Make sure you have the following additional repos checked out:
-* [notifier](https://github.com/microservices-march-2022/notifier)
-* [messenger](https://github.com/microservices-march-2022/messenger)
+## Usage
 
-1. From the `notifier` repository, run `docker build -t messenger:1 .`
-1. From the `messenger` repository, run `docker build -t notifier:1 .`
+The aim is to set things up as manually as possible without creating "magic" via Docker Compose or involving something heavy like Kubernetes.  Future iterations might have examples of more advanced setups.
 
-### Start up Platform
-This starts up shared infrastructure.
-1. From this repo, run `docker-compose up` (you can run it with `-d` to have it run in background if desired)
+### Prerequisites
 
-### Start the `messenger` service
-1. From the `messenger` repository, run `docker-compose up` (you can run it with `-d` to have it run in background if desired) to start the postgres database.
-1. Start the service in a container configured: `docker run --rm -p 8083:8083 --name messenger -e PGPASSWORD=postgres -e CREATE_DB_NAME=messenger -e PGHOST=messenger-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=8083 --network mm_2023 messenger:1`
-1. Go into the container to set up the db: `docker exec -it messenger /bin/bash`
-1. Create the db: `PGDATABASE=postgres node bin/create-db.mjs`
-1. Create the tables: `node bin/create-schema.mjs`
-1. Create seed data `node bin/create-seed-data.mjs`
+Make sure you have this repo as well as the following additional repos checked out:
 
-### Start the `notifier` service
-1. From the `notifier` repository, run `docker-compose up` (you can run it with `-d` to have it run in background if desired) to start the postgres database.
-1. Start the service in a container configured: `docker run --rm -p 8084:8084 --name notifier -e PGPASSWORD=postgres -e CREATE_DB_NAME=notifier -e PGHOST=notifier-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=8084 -e PGPORT=5433 --network mm_2023 notifier:1`
-1. Go into the container to set up the db: `docker exec -it notifier /bin/bash`
-1. Create the db: `PGDATABASE=postgres node bin/create-db.mjs`
-1. Create the tables: `node bin/create-schema.mjs`
-1. Create seed data `node bin/create-seed-data.mjs`
+* [notifier](https://github.com/microservices-march/notifier)
+* [messenger](https://github.com/microservices-march/messenger)
+
+### Start the Shared Platform Infrastructure
+
+From this repo, run:
+
+```bash
+docker-compose up -d
+```
+
+### Start the `messenger` Service
+
+1. From the `messenger` repository, build the Docker image:
+
+    ```bash
+    docker build -t messenger .
+    ```
+
+2. From the `messenger` repository, start the PostgreSQL database:
+
+    ```bash
+    docker-compose up -d
+    ```
+
+3. Start the `messenger` service in a container:
+
+    ```bash
+    docker run -d -p 8083:8083 --name messenger -e PGPASSWORD=postgres -e CREATE_DB_NAME=messenger -e PGHOST=messenger-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=8083 --network mm_2023 messenger
+    ```
+
+4. SSH into the container to set up the PostgreSQL DB:
+
+    ```bash
+    docker exec -it messenger /bin/bash
+    ```
+
+5. Create the PostgreSQL DB:
+
+    ```bash
+    PGDATABASE=postgres node bin/create-db.mjs
+    ```
+
+6. Create the PostgreSQL DB tables:
+
+    ```bash
+    node bin/create-schema.mjs
+    ```
+
+7. Create some PostgreSQL DB seed data:
+
+    ```bash
+    node bin/create-seed-data.mjs
+    ```
+
+### Start the `notifier` Service
+
+1. From the `notifier` repository, build the Docker image:
+
+    ```bash
+    docker build -t notifier .
+    ```
+
+2. From the `notifier` repository, start the PostgreSQL database:
+
+    ```bash
+    docker-compose up -d
+    ```
+
+3. Start the `notifier` service in a container:
+
+    ```bash
+    docker run -d -p 8084:8084 --name notifier -e PGPASSWORD=postgres -e CREATE_DB_NAME=notifier -e PGHOST=notifier-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=8084 -e PGPORT=5433 --network mm_2023 notifier
+    ```
+
+4. SSH into the container to set up the PostgreSQL DB:
+
+    ```bash
+    docker exec -it notifier /bin/bash
+    ```
+
+5. Create the PostgreSQL DB:
+
+    ```bash
+    PGDATABASE=postgres node bin/create-db.mjs
+    ```
+
+6. Create the PostgreSQL DB tables:
+
+    ```bash
+    node bin/create-schema.mjs
+    ```
+
+7. Create some PostgreSQL DB seed data:
+
+    ```bash
+    node bin/create-seed-data.mjs
+    ```
 
 ### Use the Service
-Follow the instructions [here](https://github.com/microservices-march-2022/messenger#using-the-service) to test out the service. You should see notification logs coming from the `notifier:1` container.  You can see them easily by running `docker logs -f notifier`
+
+Follow the instructions [here](https://github.com/microservices-march/messenger#using-the-service) to test out the service. You should see notification logs coming from the `notifier:1` container.  You can see them easily by running `docker logs -f notifier`
 
 ## RabbitMQ (Message Queue)
-Message queues are an important tool in microservice architectures to allow us to further decouple services from each other.
+
+Message queues are an important tool in microservices architectures to allow us to further decouple services from each other.
+
+## Cleanup
+
+Once you are done playing with this microservices demo architecture, to remove all running and dangling containers, run:
+
+```bash
+docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+```
+
+Then, from this repo, run:
+
+```bash
+docker-compose down
+```
+
+And finally, to remove any potentially dangling images, run once:
+
+```bash
+docker rmi $(docker images -f dangling=true -aq)
+```
