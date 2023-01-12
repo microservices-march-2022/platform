@@ -11,9 +11,9 @@ In this example we use `docker-compose` to allow you to easily get started. The 
 
 <details>
   <summary>Quick Start</summary>
+
     ## Prerequisites
-    > **Warning**
-    > For the quick start to work, you must clone all the service repositories into the same directory as shown below
+
     ```bash
     ── microservices_march
         ├── messenger
