@@ -1,16 +1,31 @@
 version: '3.2'
+
+# This docker-compose file sets up the services
+# and shared infrastructure on a common network called
+# `microservices_demo_1`. Because of this, all services
+# are able to communicate by their `container_name`.
+
+# Only the load balancer ports are mapped out. However, we
+# also leave the ports for the databases and the rabbit queue
+# mapped out so that you can connect GUI-based tooling to them,
+# or access the RabbitMQ admin interface
+
 services:
   load_balancer:
     image: 'nginx:1.23'
+
+    # The load balancer depends on the hostnames of the messenger application
+    # So it needs to start once those are created.
     depends_on:
       - messenger
       - notifier
     volumes:
       - './load_balancer/nginx.conf:/etc/nginx/nginx.conf:ro'
+
+    # The load balancer is the only service that has ports exposed out.
     ports:
       - '80:80'
     environment:
-      - NGINX_HOST=foobar.com
       - NGINX_PORT=80
     networks:
       - microservices_demo_1
@@ -19,6 +34,10 @@ services:
     image: 'rabbitmq:3.11.4-management-alpine'
     container_name: rabbitmq
     hostname: microservices_march
+
+    # The healthcheck is critical, because we need the RabbitMQ
+    # server to actually be up and accepting connections before we
+    # start the applications, otherwise they will crash.
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -36,6 +55,12 @@ services:
   messenger:
     image: microservices_demo/messenger
     container_name: messenger
+
+    # This uses the `Dockerfile` in the `messenger` repository
+    # to build the container for the service.
+    # If you've made changes to the `messenger` application,
+    # run `docker-compose -f docker-compose.full-demo.yml build`
+    # to make sure this file is using the updated container.
     build:
       context: ../messenger
     depends_on:
@@ -68,6 +93,7 @@ services:
       PGPASSWORD: postgres
       CREATE_DB_NAME: notifier
       PGHOST: notifier-db
+      # Note that we are running this database on a nonstandard port to avoid conflicts
       PGPORT: 5433
       AMQPHOST: rabbitmq
       AMQPPORT: 5672
@@ -118,6 +144,8 @@ services:
     networks:
       - microservices_demo_1
 
+# Docker volumes are used for all services
+# that persist data to avoid permissions issues on some systems.
 volumes:
   rabbit-data:
   rabbit-log:
