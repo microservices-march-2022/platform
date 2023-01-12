@@ -1,37 +1,130 @@
-version: "3.2"
+version: '3.2'
 services:
-  rabbitmq:
-    image: rabbitmq:3.11.4-management-alpine
-    container_name: 'rabbitmq'
-    hostname: microservices_march
-    depends_on:
-      - load_balancer
-    ports:
-        - 5672:5672
-        - 15672:15672
-    volumes:
-        - rabbit-data:/var/lib/rabbitmq/
-        - rabbit-log:/var/log/rabbitmq/
-    networks:
-        - mm_2023
   load_balancer:
-    image: nginx:1.23
+    image: 'nginx:1.23'
+    depends_on:
+      - messenger
+      - notifier
     volumes:
-      - ./load_balancer/nginx.conf:/etc/nginx/nginx.conf:ro
+      - './load_balancer/nginx.conf:/etc/nginx/nginx.conf:ro'
     ports:
-      - 80:80
+      - '80:80'
     environment:
       - NGINX_HOST=foobar.com
       - NGINX_PORT=80
     networks:
-        - mm_2023
-        
+      - microservices_demo_1
+
+  rabbitmq:
+    image: 'rabbitmq:3.11.4-management-alpine'
+    container_name: rabbitmq
+    hostname: microservices_march
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - 'rabbit-data:/var/lib/rabbitmq/'
+      - 'rabbit-log:/var/log/rabbitmq/'
+    networks:
+      - microservices_demo_1
+
+  messenger:
+    image: microservices_demo/messenger
+    container_name: messenger
+    build:
+      context: ../messenger
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      notifier-db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+      CREATE_DB_NAME: messenger
+      PGHOST: messenger-db
+      PGPORT: 5432
+      AMQPHOST: rabbitmq
+      AMQPPORT: 5672
+      PORT: 4000
+    networks:
+      - microservices_demo_1
+
+  notifier:
+    image: microservices_demo/notifier
+    container_name: notifier
+    build:
+      context: ../notifier
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      notifier-db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+      CREATE_DB_NAME: notifier
+      PGHOST: notifier-db
+      PGPORT: 5433
+      AMQPHOST: rabbitmq
+      AMQPPORT: 5672
+      PORT: 5000
+    networks:
+      - microservices_demo_1
+
+  messenger-db:
+    image: 'postgres:15'
+    container_name: messenger-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: messenger
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'messenger-db-data:/var/lib/postgresql/data/pgdata'
+    networks:
+      - microservices_demo_1
+
+  notifier-db:
+    image: 'postgres:15'
+    container_name: notifier-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notifier
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PGPORT: 5433
+    ports:
+      - '5433:5433'
+    volumes:
+      - 'notifier-db-data:/var/lib/postgresql/data/pgdata'
+    networks:
+      - microservices_demo_1
 
 volumes:
   rabbit-data:
   rabbit-log:
+  messenger-db-data:
+  notifier-db-data:
 
 networks:
-  mm_2023:
-    name: mm_2023
+  microservices_demo_1:
+    name: microservices_demo_1
     driver: bridge
