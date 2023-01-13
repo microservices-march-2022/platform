@@ -5,8 +5,8 @@ Shared infrastructure for the Microservices March demo architecture.
 
 The aim of this demo architecture is to set up a microservices architecture as manually as possible without involving something heavy like Kubernetes. Future iterations might have examples of more advanced setups.
 
-## Running just shared infrastructure
-If you are running some subset of the services manually, just run `docker-compose up` from this repository to start up the message queue.  This does not set up the NGINX load balancer.
+## Running Only Shared Infrastructure
+If you are working on one of the services, such as [messenger](https://github.com/microservices-march/messenger), that depends on a piece of shared infrastructure to function, you can run `docker-compose up` from this repository to provide that infrastructure. This does not set up the NGINX load balancer.
 
 ## Setting Up the Demo Architecture
 

@@ -4,7 +4,7 @@ version: "3.2"
 # This Docker Compose file sets up the services
 # and shared infrastructure on a common network called
 # `microservices_demo_1`. Because of this, all services
-# are able to communicate by their `container_name`.
+# are able to communicate by using the value of their `container_name` key as the hostname.
 
 # Only the ports for the `load_balancer`, `rabbitmq`, `notifier-db`, and `messenger-db` are mapped to the host.
 # For the `load_balancer` service, this is to make the backend services accessible.
@@ -15,6 +15,7 @@ version: "3.2"
 services:
   load_balancer:
     image: "nginx:1.23"
+    container_name: load_balancer
 
     # The load balancer depends on the hostnames of the messenger application
     # So it needs to start once those are created.
