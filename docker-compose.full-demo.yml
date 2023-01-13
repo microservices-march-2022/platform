@@ -1,6 +1,6 @@
 version: '3.2'
 
-# This docker-compose file sets up the services
+# This Docker Compose file sets up the services
 # and shared infrastructure on a common network called
 # `microservices_demo_1`. Because of this, all services
 # are able to communicate by their `container_name`.
