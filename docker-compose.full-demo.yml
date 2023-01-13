@@ -6,10 +6,11 @@ version: "3.2"
 # `microservices_demo_1`. Because of this, all services
 # are able to communicate by their `container_name`.
 
-# Only the load balancer ports are mapped out. However, we
-# also leave the ports for the databases and the rabbit queue
-# mapped out so that you can connect GUI-based tooling to them,
-# or access the RabbitMQ admin interface
+# Only the ports for the `load_balancer`, `rabbitmq`, `notifier-db`, and `messenger-db` are mapped to the host.
+# For the `load_balancer` service, this is to make the backend services accessible.
+# The other ports are exposed to the host for the purposes of accessing their
+# GUI admin interfaces in the case of `rabbitmq`, and to allow the connection of
+# database management tools in the case of the two postgres databases.
 
 services:
   load_balancer:
