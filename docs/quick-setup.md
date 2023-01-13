@@ -52,7 +52,6 @@ Run the following commands to prepare the databases for the `messenger` and `not
 
 You should only need to do this once, but you can do it again if you want to "reset" the data back to a clean state since these commands completely recreate the database.
 
-
 ### `messenger` Database Setup
 
 ```bash
@@ -87,7 +86,7 @@ Start tailing the `notifier` logs to see notifications:
 docker-compose logs -f notifier
 ```
 
-Now you can create a conversation between two users and send some messages.  You should see information about the notifications going out in the notifier logs.
+Now you can create a conversation between two users and send some messages. You should see information about the notifications going out in the notifier logs.
 
 ```bash
 # Create a conversation between user 1 and user 2
