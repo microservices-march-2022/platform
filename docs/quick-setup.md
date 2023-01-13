@@ -1,9 +1,11 @@
 # Quick Setup
+
 > **Note**
 > This repository is meant to hold the shared infrastructure for the demo architecture.
 > Starting up the entire system including the applications is not part of its role, but instructions are included here for simplicity.
 
 ## Prerequisites
+
 > **Warning**
 > For the quick start to work, you must clone all the service repositories into the same directory as shown below
 
@@ -15,6 +17,7 @@
 ```
 
 For example:
+
 ```bash
 mkdir microservices_march
 
@@ -31,23 +34,26 @@ All the following commands assume that you have this directory structure. The qu
 The name of the parent directory can be whatever you'd like.
 
 ## Starting the Demo Architecture
+
 The following command will start all the services and shared infrastructure:
 
 ```bash
 docker-compose -f docker-compose.full-demo.yml up --abort-on-container-exit -d
 ```
+
 > **Note**
 > See that we set `--abort-on-container-exit`. This is because we need all services to be up and running, but docker-compose will happily start up just the services it can if you do not pass this flag. This can lead to confusing failures.
 
 At this point, all the services, their databases, and the shared infrastructure is up and running. However, we need to set up the database schemas and sample data for the services.
 
 ## Set up the Databases
+
 Run the following commands to prepare the databases for the `messenger` and `notifier` applications.
 
 You should only need to do this once, but you can do it again if you want to "reset" the data back to a clean state since these commands completely recreate the database.
 
-
 ## `messenger` DB Setup
+
 ```bash
 # This script creates the databse in postgres
 docker-compose exec -e PGDATABASE=postgres messenger node bin/create-db.mjs
@@ -60,6 +66,7 @@ docker-compose exec messenger node bin/create-seed-data.mjs
 ```
 
 ## `notifier` DB Setup
+
 ```bash
 # This script creates the databse in postgres
 docker-compose exec -e PGDATABASE=postgres notifier node bin/create-db.mjs
@@ -72,12 +79,14 @@ docker-compose exec notifier node bin/create-seed-data.mjs
 ```
 
 ## Verify it's Working
+
 Now start tailing the `notifier` logs to see notifications:
+
 ```bash
 docker-compose logs -f notifier
 ```
 
-Now you can create a conversation between two users and send some messages.  You should see information about the notifications going out in the notifier logs.
+Now you can create a conversation between two users and send some messages. You should see information about the notifications going out in the notifier logs.
 
 ```bash
 # Create a conversation between user 1 and user 2

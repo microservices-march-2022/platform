@@ -2,16 +2,16 @@ version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3.11.4-management-alpine
-    container_name: 'rabbitmq'
+    container_name: "rabbitmq"
     hostname: microservices_march
     ports:
-        - 5672:5672
-        - 15672:15672
+      - 5672:5672
+      - 15672:15672
     volumes:
-        - rabbit-data:/var/lib/rabbitmq/
-        - rabbit-log:/var/log/rabbitmq/
+      - rabbit-data:/var/lib/rabbitmq/
+      - rabbit-log:/var/log/rabbitmq/
     networks:
-        - mm_2023
+      - mm_2023
 
 volumes:
   rabbit-data:
