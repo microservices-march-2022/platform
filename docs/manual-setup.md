@@ -1,9 +1,11 @@
 # Manual Setup
-> **Note**
+
+> **Note:**
 > This repository is meant to hold the shared infrastructure for the demo architecture.
 > Starting up the entire system including the applications is not part of its role, but instructions are included here for simplicity.
 
 ## Prerequisites
+
 Make sure you have this repo as well as the following additional repos checked out:
 
 * [notifier](https://github.com/microservices-march/notifier)
