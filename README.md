@@ -29,3 +29,13 @@ Currently only the `messenger` service accepts HTTP requests, so it simply route
 ### RabbitMQ (Message Queue)
 
 Message queues are an important tool in microservices architectures to allow us to further decouple services from each other.
+
+## Development
+
+Read the [`CONTRIBUTING.md`](https://github.com/microservices-march/platform/blob/main/CONTRIBUTING.md) file for instructions on how to best contribute to this repository.
+
+## License
+
+[Apache License, Version 2.0](https://github.com/microservices-march/platform/blob/main/LICENSE)
+
+&copy; [F5 Networks, Inc.](https://www.f5.com/) 2023
