@@ -37,8 +37,6 @@ Note: if you'd like to implement a new feature, please consider creating a featu
 
 ## Code Guidelines
 
-<!-- ### Go/Python/Bash Guidelines (OPTIONAL) -->
-
 ### Git Guidelines
 
 * Keep a clean, concise and meaningful git commit history on your branch (within reason), rebasing locally and squashing before submitting a PR.
