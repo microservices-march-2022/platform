@@ -56,26 +56,26 @@ You should only need to do this once, but you can do it again if you want to "re
 
 ```bash
 # This script creates the database
-docker-compose exec -e PGDATABASE=postgres messenger node bin/create-db.mjs
+docker-compose exec -e PGDATABASE=postgres messenger node scripts/create-db.mjs
 
 # This script sets up the tables, constraints, and indexes
-docker-compose exec messenger node bin/create-schema.mjs
+docker-compose exec messenger node scripts/create-schema.mjs
 
 # This script writes seed data to the tables
-docker-compose exec messenger node bin/create-seed-data.mjs
+docker-compose exec messenger node scripts/create-seed-data.mjs
 ```
 
 ### `notifier` Database Setup
 
 ```bash
 # This script creates the database
-docker-compose exec -e PGDATABASE=postgres notifier node bin/create-db.mjs
+docker-compose exec -e PGDATABASE=postgres notifier node scripts/create-db.mjs
 
 # This script sets up the tables, constraints, and indexes
-docker-compose exec notifier node bin/create-schema.mjs
+docker-compose exec notifier node scripts/create-schema.mjs
 
 # This script writes seed data to the tables
-docker-compose exec notifier node bin/create-seed-data.mjs
+docker-compose exec notifier node scripts/create-seed-data.mjs
 ```
 
 ## Verify the Deployment is Working
