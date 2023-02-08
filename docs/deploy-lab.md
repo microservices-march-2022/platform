@@ -6,7 +6,7 @@ In this tutorial, you'll explore how to use [Azure Container Apps](https://learn
 
 ## Create an Azure account and install resources
 
-This workshop uses Azure Container Apps as the cloud-based host for the NGINX application. You'll need to create an Azure account and install the Azure CLI to complete this tutorial.
+This workshop uses Azure Container Apps as the cloud-based host for an NGINX webserver playing the role of the application. You'll need to create an Azure account and install the Azure CLI to complete this tutorial.
 
 > **NOTE**: While this tutorial uses Azure Container Apps, the concepts and techniques can be applied to any cloud-based host.
 
