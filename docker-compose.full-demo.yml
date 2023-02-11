@@ -65,7 +65,7 @@ services:
     # run `docker-compose -f docker-compose.full-demo.yml build`
     # to make sure this file is using the updated container.
     build:
-      context: ../messenger
+      context: ../messenger/app
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -86,7 +86,7 @@ services:
     image: microservices_demo/notifier
     container_name: notifier
     build:
-      context: ../notifier
+      context: ../notifier/app
     depends_on:
       rabbitmq:
         condition: service_healthy

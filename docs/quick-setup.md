@@ -38,11 +38,11 @@ The name of the parent directory can be whatever you'd like.
 The following command will start all the services and shared infrastructure:
 
 ```bash
-docker-compose -f docker-compose.full-demo.yml up --abort-on-container-exit -d
+docker-compose -f docker-compose.full-demo.yml up --abort-on-container-exit
 ```
 
 > **Note:**
-> See that we set `--abort-on-container-exit`. This is because we need all services to be up and running, but docker-compose will happily start up just the services it can if you do not pass this flag. This can lead to confusing failures.
+> See that we set `--abort-on-container-exit`. This is because we need all services to be up and running, but docker-compose will happily start up just the services it can if you do not pass this flag. This can lead to confusing failures. By default, this will also make Docker output your container logs to your terminal, so you will have to open a new terminal window/tab to follow the rest of this guide.
 
 At this point, all the services, their databases, and the shared infrastructure is up and running. However, we need to set up the database schemas and sample data for the services.
 
@@ -56,26 +56,26 @@ You should only need to do this once, but you can do it again if you want to "re
 
 ```bash
 # This script creates the database
-docker-compose exec -e PGDATABASE=postgres messenger node bin/create-db.mjs
+docker-compose exec -e PGDATABASE=postgres messenger node scripts/create-db.mjs
 
 # This script sets up the tables, constraints, and indexes
-docker-compose exec messenger node bin/create-schema.mjs
+docker-compose exec messenger node scripts/create-schema.mjs
 
 # This script writes seed data to the tables
-docker-compose exec messenger node bin/create-seed-data.mjs
+docker-compose exec messenger node scripts/create-seed-data.mjs
 ```
 
 ### `notifier` Database Setup
 
 ```bash
 # This script creates the database
-docker-compose exec -e PGDATABASE=postgres notifier node bin/create-db.mjs
+docker-compose exec -e PGDATABASE=postgres notifier node scripts/create-db.mjs
 
 # This script sets up the tables, constraints, and indexes
-docker-compose exec notifier node bin/create-schema.mjs
+docker-compose exec notifier node scripts/create-schema.mjs
 
 # This script writes seed data to the tables
-docker-compose exec notifier node bin/create-seed-data.mjs
+docker-compose exec notifier node scripts/create-seed-data.mjs
 ```
 
 ## Verify the Deployment is Working
