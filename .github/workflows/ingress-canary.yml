@@ -1,0 +1,60 @@
+---
+name: Azure Container Apps Deploy
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+jobs:
+  build-deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v0
+        with:
+          appSourcePath: ${{ github.workspace }}/load_balancer/ # Location of Dockerfile
+          acrName: ${{ secrets.ACR_NAME }} # Name of Azure Container Registry
+          containerAppName: ${{ secrets.CONTAINER_APP_NAME }} # Name of Azure Container App
+          resourceGroup: ${{ secrets.RESOURCE_GROUP }} # Name of Azure Resource Group
+
+  test-deployment:
+    needs: build-deploy
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get new container name
+        run: |
+          # Enable extension installation
+          az config set extension.use_dynamic_install=yes_without_prompt
+          # Get the last deployed revision name
+          REVISION_NAME=`az containerapp revision list -n ${{ secrets.CONTAINER_APP_NAME }} -g ${{ secrets.RESOURCE_GROUP }} --query "[].name" -o tsv | tail -1`
+          # Get the last deployed revision's fqdn
+          REVISION_FQDN=`az containerapp revision show -n ${{ secrets.CONTAINER_APP_NAME }} -g ${{ secrets.RESOURCE_GROUP }} --revision "$REVISION_NAME" --query properties.fqdn -o tsv`
+          # Store values in env vars
+          echo "REVISION_NAME=$REVISION_NAME" >> $GITHUB_ENV
+          echo "REVISION_FQDN=$REVISION_FQDN" >> $GITHUB_ENV
+
+      - name: Test deployment
+        id: test-deployment
+        uses: jtalk/url-health-check-action@v3 # Marketplace action to touch the endpoint
+        with:
+          url: "https://${{ env.REVISION_FQDN }}/api" # Staging endpoint
+
+      - name: Deploy succeeded
+        run: |
+          echo "Deployment succeeded! Enabling new revision"
+          az containerapp ingress traffic set -n ${{ secrets.CONTAINER_APP_NAME }} -g ${{ secrets.RESOURCE_GROUP }} --revision-weight "${{ env.REVISION_NAME }}=100"
