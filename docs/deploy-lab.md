@@ -274,7 +274,7 @@ Let's create a good update and see the workflow succeed.
 5. Select **Create a new branch for this commit and start a pull request.** on the dialog box.
 6. Select **Create pull request** to access the pull request template.
 7. Select **Create pull request** again to create the pull request.
-8. Select **Actions** to monitor the progress of the workflow. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/api**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the updated message.
+8. Select **Actions** to monitor the progress of the workflow. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/health**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the updated message.
 
 ### Unsuccessful Update
 
@@ -287,7 +287,7 @@ Let's create a bad update and see the workflow fail.
 5. Select **Commit changes**.
 6. Ensure **Commit directly to the <YOUR_NAME>-patch-1 branch** is selected.
 7. Select **Commit changes**.
-8. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/api**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the message is still **Updated!!**, which is the message from the previous update.
+8. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/health**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the message is still **Updated!!**, which is the message from the previous update.
 
 ## Next Steps
 
