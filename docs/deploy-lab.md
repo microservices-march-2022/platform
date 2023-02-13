@@ -344,26 +344,112 @@ You'll finish the configuration of the workflow by testing it. You'll first make
 
 ### Successful Update
 
-Let's create a successful update and see the workflow succeed:
+Let's create a successful update and see the workflow succeed.
+
+If using the GitHub UI/website:
 
 1. Select **Code** > **ingress** > **default.conf.template**.
 2. Select the pencil icon with the tooltip "Edit this file" to edit the file.
-3. Update line **36** to read `return 200 "Good Update!\n";`.
+3. Update line **36** to read `return 200 "Successful Update!\n";`.
 4. Select **Create a new branch for this commit and start a pull request.** on the dialog box and then select **Propose changes**.
 5. Select **Create pull request** to access the pull request template.
 6. Select **Create pull request** again to create the pull request.
 7. Select **Actions** to monitor the progress of the workflow. When the workflow completes, navigate to your container app by navigating to the `<ACR_URL>/health` endpoint, where the `<ACR_URL>` is the URL you copied earlier. Notice the updated message.
 
+If using the GitHub CLI:
+
+1. Create a new branch called `patch-1`:
+
+   ```bash
+   git checkout -b patch-1
+   ```
+
+2. Update line **36** in the NGINX ingress configuration file to `return 200 "Successful Update!\n"`:
+
+   ```bash
+   vim ingress/default.conf.template
+   ```
+
+3. Track the modified file in `git`:
+
+   ```bash
+   git add ingress/default.conf.template
+   ```
+
+4. Commit the file to `git`:
+
+   ```bash
+   git commit -m "feat: update NGINX ingress"
+   ```
+
+5. Push your changes to GitHub:
+
+   ```bash
+   git push --set-upstream origin patch-1
+   ```
+
+6. Create a PR:
+
+   ```bash
+   gh pr create --head patch-1 --fill --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
+   ```
+
+7. Monitor the progress of the workflow:
+
+   ```bash
+   gh workflow view main.yml --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
+   ```
+
 ### Unsuccessful Update
 
-Let's create an unsuccessful update and see the workflow fail:
+Let's create an unsuccessful update and see the workflow fail.
+
+If using the GitHub UI/website:
 
 1. Select **Code** > **ingress** > **default.conf.template**.
 2. In the upper left, select **main** then the name of the branch which ends with **patch-1**, which is the branch created in the previous step.
 3. Select the pencil icon with the tooltip "Edit this file" to edit the file.
-4. Update line **36** to read `return 500 "Bad Update!\n";`.
+4. Update line **36** to read `return 500 "Unsuccessful Update!\n";`.
 5. Select **Commit directly to the <YOUR_GITHUB_ACCOUNT_NAME>-patch-1 branch** is selected and then select **Commit changes**
-6. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by navigating to the `<ACR_URL>/health` endpoint, where `<ACR_URL>` is the URL you copied earlier. Notice the message is still `Good Update!`, which is the message from the previous update.
+6. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by navigating to the `<ACR_URL>/health` endpoint, where `<ACR_URL>` is the URL you copied earlier. Notice the message is still `Successful Update!`, which is the message from the previous update.
+
+If using the GitHub CLI:
+
+1. Checkout the `patch-1` branch you created in the previous section:
+
+   ```bash
+   git checkout patch-1
+   ```
+
+2. Update line **36** in the NGINX ingress configuration file to `return 200 "Unsuccessful Update!\n"`:
+
+   ```bash
+   vim ingress/default.conf.template
+   ```
+
+3. Track the modified file in `git`:
+
+   ```bash
+   git add ingress/default.conf.template
+   ```
+
+4. Commit the file to `git`:
+
+   ```bash
+   git commit -m "feat: update NGINX ingress again"
+   ```
+
+5. Push your changes to GitHub:
+
+   ```bash
+   git push
+   ```
+
+6. Monitor the progress of the workflow:
+
+   ```bash
+   gh workflow view main.yml --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
+   ```
 
 ## Next Steps
 
