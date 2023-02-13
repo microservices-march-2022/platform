@@ -451,6 +451,29 @@ If using the GitHub CLI:
    gh workflow view main.yml --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
    ```
 
+## Resource Cleanup
+
+Once you are done with the lab you might want to remove the Azure resources you deployed in the lab to avoid any potential charges down the line:
+
+```bash
+az group delete -n my-container-app-rg -y
+```
+
+You can delete the fork you created if you wish.
+
+If using the GitHub UI/website:
+
+1. Select **Settings**.
+2. Scroll down to the bottom of the page.
+3. Select **Delete this repository**.
+4. Type `<YOUR_GITHUB_ACCOUNT_NAME>/platform` and select **I understand the consequences, delete this repository**.
+
+If using the GitHub CLI:
+
+```bash
+gh repo delete <YOUR_GITHUB_ACCOUNT_NAME>/platform --yes
+```
+
 ## Next Steps
 
 Congratulations! You've now seen how to use GitHub Actions to enable blue-green deployments. You started by configuring the resources on Azure, configuring the repository with the settings necessary for the workflow, and created the workflow itself. You finished by testing the workflow by making a successful and unsuccessful change to the application.
@@ -462,9 +485,6 @@ From here, you can continue to explore and grow your knowledge of DevOps. Here a
 - [Deploying with GitHub Actions](https://docs.github.com/actions/deployment/about-deployments/about-continuous-deployment)
 - [Monitoring and troubleshooting GitHub Actions](https://docs.github.com/actions/monitoring-and-troubleshooting-workflows/about-monitoring-and-troubleshooting)
 
-## Resource Cleanup
-
-TODO
 
 ## Complete Workflow File
 
