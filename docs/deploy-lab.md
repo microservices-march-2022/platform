@@ -6,60 +6,74 @@ In this lab, you'll explore how to use [Azure Container Apps](https://learn.micr
 
 ## Create an Azure Account and Install Resources
 
-This workshop uses Azure Container Apps as the cloud-based host for an NGINX container playing the role of an application's ingress. You'll need to create an Azure account and install the Azure CLI to complete this lab.
+This workshop uses Azure Container Apps as the cloud-based host for an NGINX container playing the role of an application's ingress. You'll need to create an Azure account and install the Azure CLI to complete this lab. Optionally, if you wish to run the lab in its entirety from your terminal, you will also need the GitHub CLI.
 
 > **NOTE:** While this lab uses Azure Container Apps, the concepts and techniques can be applied to any cloud-based host.
 
 1. Create an [Azure account](https://azure.microsoft.com/free/) if you don't already have one. We also recommend you create a new account if your current Azure account is provided by your company to prevent any potential permission related issues.
 2. Install the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
+3. (Optional) Install the [GitHub CLI](https://cli.github.com/).
 
 ## Create the Initial Container App
 
 With the tooling installed, you can now create the container app. This will be the initial version of the application, and will be used as the baseline for the blue/green deployment. You will login to Azure using the Azure CLI, install the extension for Azure Container Apps, clone the starting repository, and then deploy the container app.
 
-1. Fork the [Microservices March platform](https://github.com/microservices-march/platform) repository to your personal GitHub account.
-2. Open a terminal or command window.
-3. Clone your repository locally, replacing <YOUR_GITHUB_ACCOUNT_NAME> with your account name:
+1. Open a terminal or command window and create a Microservices March directory:
 
    ```bash
-   git clone https://github.com/<YOUR_GITHUB_ACCOUNT_NAME>/platform.git
-   cd platform
-   cd ingress
+   mkdir microservices-march
+   cd microservices-march
    ```
 
-4. Run the following command to login to Azure for the Azure CLI. Follow the prompts to login using a browser window:
+2. Fork and clone the [Microservices March platform](https://github.com/microservices-march/platform) repository to your personal GitHub account:
+
+   - If using the GitHub UI/website, select **Fork** on the upper right corner, and in the **Owner** menu, select your personal GitHub account. Then, clone your repository locally, replacing <YOUR_GITHUB_ACCOUNT_NAME> with your account name:
+
+     ```bash
+      git clone https://github.com/<YOUR_GITHUB_ACCOUNT_NAME>/platform.git
+      cd platform
+     ```
+
+   - If using the GitHub CLI, run:
+
+     ```bash
+     gh repo fork microservices-march/platform --clone
+     cd platform
+     ```
+
+3. Run the following command to login to Azure for the Azure CLI. Follow the prompts to login using a browser window:
 
    ```bash
    az login
    ```
 
-5. Run the following command to install the `containerapp` extension:
+4. Run the following command to install the `containerapp` extension:
 
    ```bash
    az extension add --name containerapp --upgrade
    ```
 
-6. Run the following command to create a resource group for the container app:
+5. Run the following command to create a resource group for the container app:
 
    ```bash
    az group create --name my-container-app-rg --location westus
    ```
 
-7. Run the following command to deploy the container to Azure Container Apps:
+6. Run the following command to deploy the container to Azure Container Apps:
 
    ```bash
    az containerapp up \
        --resource-group my-container-app-rg \
        --name my-container-app \
-       --source . \
+       --source ./ingress \
        --ingress external \
        --target-port 80 \
        --location westus
    ```
 
-8. In the command output, find the name and the URL of the newly created Azure Container Registry container app. They should look like **cac085021b77acr** (you should be able to find it under the `registry` key) and **<https://my-container-app.delightfulmoss-eb6d59d5.westus.azurecontainerapps.io>** (this URL is hard to miss in the command output) respectively. You'll need this name (from here on `<ACR_NAME>`) and URL (from here on `<ACR_URL>`) in the next section.
+7. In the command output, find the name and the URL of the newly created Azure Container Registry container app. They should look like **cac085021b77acr** (you should be able to find it under the `registry` key) and **<https://my-container-app.delightfulmoss-eb6d59d5.westus.azurecontainerapps.io>** (this URL is hard to miss in the command output, but do note that you need the `https` endpoint, not the `http` one) respectively. You'll need this name (from here on `<ACR_NAME>`) and URL (from here on `<ACR_URL>`) in the next section.
 
-9. Run the following command to enable revisions for the container app, which will allow for blue-green deployments:
+8. Run the following command to enable revisions for the container app, which will allow for blue-green deployments:
 
    ```bash
    az containerapp revision set-mode \
@@ -68,13 +82,13 @@ With the tooling installed, you can now create the container app. This will be t
        --mode multiple
    ```
 
-10. (Optional) Test that your deployment is working by quering the container endpoint:
+9. (Optional) Test that your deployment is working by quering the container `/health` endpoint:
 
-    ```bash
-    curl <ACR_URL>/health
-    ```
+   ```bash
+   curl <ACR_URL>/health
+   ```
 
-    The output should show `OK`.
+   The output should show `OK`.
 
 ## Create the Managed Identity for Deployment
 
@@ -142,18 +156,20 @@ While this set of steps may seem tedious, it's fortunately one you'll only need 
 
 ## Create the Secret in Your GitHub Repository
 
-In order to deploy the new version of the application, you'll need to create a secret in your GitHub repository. This secret will contain the JSON credentials for the managed identity created in the prior step, and the necessary settings to deploy to Azure. You'll then use these secrets in the GitHub action to automate deployment.
+In order to deploy a new version of the application, you'll need to create a secret in the GitHub repository you forked at the beginning of this lab. This secret will contain the JSON credentials for the managed identity created in the prior step, and the necessary settings to deploy to Azure. You'll then use these secrets in a GitHub action to automate deployment.
 
-1. Navigate to your GitHub repository.
+If using the GitHub UI/website:
+
+1. Navigate to your forked GitHub repository.
 2. Select **Settings** > **Secrets and variables** > **Actions**.
 3. Select **New repository secret**.
 4. Create a new secret with the following values:
 
    - **Name**: `AZURE_CREDENTIALS`
-   - **Secret**: `<Paste the JSON credentials from Step 6 in the previous section >`
+   - **Secret**: `<Paste the JSON credentials from Step 6 in the previous section>`
 
 5. Select **Add secret**.
-6. Repeat steps 3 - 5 to create the following secrets (replacing the values with your own):
+6. Repeat Steps 3 - 5 three times to create the following secrets (replacing the values with your own):
 
    | Name                 | Secret                |
    | -------------------- | --------------------- |
@@ -161,23 +177,58 @@ In order to deploy the new version of the application, you'll need to create a s
    | `RESOURCE_GROUP`     | `my-container-app`    |
    | `ACR_NAME`           | `<ACR_NAME>`          |
 
-## Create the GitHub Action
+If using the GitHub CLI:
 
-Now that you've created the managed identity and configured the secrets, you can create the GitHub Action to automate deployment. You'll start by creating a new workflow file, and then add the necessary steps to deploy the new version of the application.
+1. Create a new secret for your Azure credentials by replacing `<SECRET>` with `AZURE_CREDENTIALS` and pasting the JSON credentials obtained from Step 6 in the previous section:
+
+   ```bash
+   gh secret set <SECRET> --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
+   ```
+
+2. Repeat Step 1 three times to create the following secrets (replacing the values with your own):
+
+   | Name                 | Secret                |
+   | -------------------- | --------------------- |
+   | `CONTAINER_APP_NAME` | `my-container-app-rg` |
+   | `RESOURCE_GROUP`     | `my-container-app`    |
+   | `ACR_NAME`           | `<ACR_NAME>`          |
+
+## Create a GitHub Action
+
+Now that you've created the managed identity and configured the secrets, you can create a GitHub Action to automate deployments. You'll start by creating a new workflow file, and then add the necessary steps to deploy a new version of the application.
 
 The entire workflow file is shown at the end of this section. You can copy the contents of the file and paste it into a new file in your GitHub repository. You can also create the file manually by following the steps below.
 
 > **IMPORTANT:** Workflow files are defined as YAML files. Whitespace is significant in YAML files, so be sure to use the same indentation as shown in the example below.
 
+If using the GitHub UI/website:
+
 1. Navigate to your GitHub repository.
-2. Select **Actions** > **New workflow**.
-3. Add the following to the YAML file to name the workflow:
+2. Select **Actions** > **New workflow** > **Skip this and set up a workflow yourself**.
+
+If using the GitHub CLI:
+
+1. Create the `.github/workflows` directory:
+
+   ```bash
+   mkdir .github/workflows
+   ```
+
+2. Use your text editor of choice to create a new file, `main.yml` in the `.github/workflows` directory (in this lab we will use `vim`, but any alternative would work):
+
+   ```bash
+   vim .github/workflows/main.yml
+   ```
+
+If using either the GitHub UI/website or the GitHub CLI:
+
+1. Add the following to the YAML file to name the workflow:
 
    ```yaml
    name: Deploy to Azure
    ```
 
-4. Add the following to the YAML file to configure the workflow to run when a push or pull request is made to the main branch:
+2. Add the following to the YAML file to configure the workflow to run when a push or pull request is made to the main branch:
 
    ```yaml
    on:
@@ -189,13 +240,13 @@ The entire workflow file is shown at the end of this section. You can copy the c
          - main
    ```
 
-5. Add the following to define the `jobs` section of the workflow:
+3. Add the following to define the `jobs` section of the workflow:
 
    ```yaml
    jobs:
    ```
 
-6. Add the following to define the `build-deploy` job. This job will checkout the code, log into Azure, and deploy the application to Azure Container App:
+4. Add the following to define the `build-deploy` job. This job will checkout the code, log into Azure, and deploy the application to Azure Container App:
 
    ```yaml
    build-deploy:
@@ -210,7 +261,7 @@ The entire workflow file is shown at the end of this section. You can copy the c
            creds: ${{ secrets.AZURE_CREDENTIALS }}
 
        - name: Build and deploy Container App
-         uses: azure/container-apps-deploy-action@v0
+         uses: azure/container-apps-deploy-action@5bbc4488982e54e10e3ff1400b47efb87e899dec
          with:
            appSourcePath: ${{ github.workspace }}/load_balancer/ # Location of Dockerfile
            acrName: ${{ secrets.ACR_NAME }} # Name of Azure Container Registry
@@ -220,7 +271,7 @@ The entire workflow file is shown at the end of this section. You can copy the c
 
    > **NOTE**: The `appSourcePath` is the location of the Dockerfile. The `acrName` is the name of the Azure Container Registry. The `containerAppName` is the name of the Azure Container App. The `resourceGroup` is the name of the Azure Resource Group.
 
-7. Add the following to define the `test-deployment` job. This job will determine the staging URL of the newly deployed revision and use a GitHub Action to ping the API endpoint to ensure it is responding. If the health check succeeds, the traffic manager on the container app will be updated to point all traffic at the newly deployed container.
+5. Add the following to define the `test-deployment` job. This job will determine the staging URL of the newly deployed revision and use a GitHub Action to ping the API endpoint to ensure it is responding. If the health check succeeds, the traffic manager on the container app will be updated to point all traffic at the newly deployed container:
 
    ```yaml
    test-deployment:
@@ -248,7 +299,7 @@ The entire workflow file is shown at the end of this section. You can copy the c
          id: test-deployment
          uses: jtalk/url-health-check-action@v3 # Marketplace action to touch the endpoint
          with:
-           url: "https://${{ env.REVISION_FQDN }}/api" # Staging endpoint
+           url: "https://${{ env.REVISION_FQDN }}/health" # Staging endpoint
 
        - name: Deploy succeeded
          run: |
@@ -256,8 +307,36 @@ The entire workflow file is shown at the end of this section. You can copy the c
            az containerapp ingress traffic set -n ${{ secrets.CONTAINER_APP_NAME }} -g ${{ secrets.RESOURCE_GROUP }} --revision-weight "${{ env.REVISION_NAME }}=100"
    ```
 
-8. Select **Commit changes**, and on the dialog select **Commit changes** again. This will merge the new workflow file to the main branch, and begin executing the workflow.
-9. Select **Actions** where you can monitor the progress of the workflow.
+If using the GitHub UI/website:
+
+1. Select **Start commit**, add a commit message if you wish, and on the dialog select **Commit new file**. This will merge the new workflow file to the main branch, and begin executing the workflow.
+2. Select **Actions** where you can monitor the progress of the workflow.
+
+If using the GitHub CLI:
+
+1. Add the file you just created to `git`:
+
+   ```bash
+   git add .github/workflows/main.yml
+   ```
+
+2. Commit the file to `git`:
+
+   ```bash
+   git commit -m "feat: create GitHub Actions workflow"
+   ```
+
+3. Push your changes to GitHub:
+
+   ```bash
+   git push
+   ```
+
+4. Monitor the progress of the workflow:
+
+   ```bash
+   gh workflow view main.yml --repo <YOUR_GITHUB_ACCOUNT_NAME>/platform
+   ```
 
 ## Test the Workflow
 
@@ -265,29 +344,26 @@ You'll finish the configuration of the workflow by testing it. You'll first make
 
 ### Successful Update
 
-Let's create a good update and see the workflow succeed.
+Let's create a successful update and see the workflow succeed:
 
-1. Select **Code** > **load_balancer** > **nginx.conf**.
+1. Select **Code** > **ingress** > **default.conf.template**.
 2. Select the pencil icon with the tooltip "Edit this file" to edit the file.
-3. Update line **36** to read `return 200 "Good Update!";`
-4. Select **Commit changes**.
-5. Select **Create a new branch for this commit and start a pull request.** on the dialog box.
-6. Select **Create pull request** to access the pull request template.
-7. Select **Create pull request** again to create the pull request.
-8. Select **Actions** to monitor the progress of the workflow. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/health**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the updated message.
+3. Update line **36** to read `return 200 "Good Update!\n";`.
+4. Select **Create a new branch for this commit and start a pull request.** on the dialog box and then select **Propose changes**.
+5. Select **Create pull request** to access the pull request template.
+6. Select **Create pull request** again to create the pull request.
+7. Select **Actions** to monitor the progress of the workflow. When the workflow completes, navigate to your container app by navigating to the `<ACR_URL>/health` endpoint, where the `<ACR_URL>` is the URL you copied earlier. Notice the updated message.
 
 ### Unsuccessful Update
 
-Let's create a bad update and see the workflow fail.
+Let's create an unsuccessful update and see the workflow fail:
 
-1. Select **Code** > **load_balancer** > **nginx.conf**.
+1. Select **Code** > **ingress** > **default.conf.template**.
 2. In the upper left, select **main** then the name of the branch which ends with **patch-1**, which is the branch created in the previous step.
 3. Select the pencil icon with the tooltip "Edit this file" to edit the file.
-4. Update line **36** to read `return 500 "Bad Update!";`
-5. Select **Commit changes**.
-6. Ensure **Commit directly to the <YOUR_NAME>-patch-1 branch** is selected.
-7. Select **Commit changes**.
-8. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by using the **<APP_CONTAINER_URL>/health**, where **<APP_CONTAINER_URL>** is the URL you copied earlier. Notice the message is still **Updated!!**, which is the message from the previous update.
+4. Update line **36** to read `return 500 "Bad Update!\n";`.
+5. Select **Commit directly to the <YOUR_GITHUB_ACCOUNT_NAME>-patch-1 branch** is selected and then select **Commit changes**
+6. Select **Actions** to monitor the progress of the workflow. Notice the workflow executes again when files in the PR are updated. When the workflow completes, navigate to your container app by navigating to the `<ACR_URL>/health` endpoint, where `<ACR_URL>` is the URL you copied earlier. Notice the message is still `Good Update!`, which is the message from the previous update.
 
 ## Next Steps
 
@@ -299,6 +375,10 @@ From here, you can continue to explore and grow your knowledge of DevOps. Here a
 - [Continuous integration](https://docs.github.com/actions/automating-builds-and-tests/about-continuous-integration)
 - [Deploying with GitHub Actions](https://docs.github.com/actions/deployment/about-deployments/about-continuous-deployment)
 - [Monitoring and troubleshooting GitHub Actions](https://docs.github.com/actions/monitoring-and-troubleshooting-workflows/about-monitoring-and-troubleshooting)
+
+## Resource Cleanup
+
+TODO
 
 ## Complete Workflow File
 
@@ -325,7 +405,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v0
+        uses: azure/container-apps-deploy-action@5bbc4488982e54e10e3ff1400b47efb87e899dec
         with:
           appSourcePath: ${{ github.workspace }}/load_balancer/ # Location of Dockerfile
           acrName: ${{ secrets.ACR_NAME }} # Name of Azure Container Registry
@@ -357,7 +437,7 @@ jobs:
         id: test-deployment
         uses: jtalk/url-health-check-action@v3 # Marketplace action to touch the endpoint
         with:
-          url: "https://${{ env.REVISION_FQDN }}/api" # Staging endpoint
+          url: https://${{ env.REVISION_FQDN }}/health # Staging endpoint
 
       - name: Deploy succeeded
         run: |
