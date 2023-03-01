@@ -8,7 +8,7 @@ The aim of this demo architecture is to set up a microservices architecture as m
 
 ## Running Only Shared Infrastructure
 
-If you are working on one of the services, such as [messenger](https://github.com/microservices-march/messenger), that depends on a piece of shared infrastructure to function, you can run `docker-compose up` from this repository to provide that infrastructure. This does not set up the NGINX load balancer.
+If you are working on one of the services, such as [messenger](https://github.com/microservices-march/messenger), that depends on a piece of shared infrastructure to function, you can run `docker-compose up` from this repository to provide that infrastructure. This does not set up the NGINX ingress.
 
 ## Setting Up the Demo Architecture
 
@@ -21,7 +21,7 @@ We provide two methods to set things up:
 
 ## Components
 
-### NGINX (Load Balancer)
+### NGINX (Ingress)
 
 NGINX is used in front of the entire archtecture to provide load balancing to all the services.
 Currently only the `messenger` service accepts HTTP requests, so it simply routes to that.

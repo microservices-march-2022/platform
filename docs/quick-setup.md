@@ -38,7 +38,7 @@ The name of the parent directory can be whatever you'd like.
 The following command will start all the services and shared infrastructure:
 
 ```bash
-docker-compose -f docker-compose.full-demo.yml up --abort-on-container-exit
+docker-compose -f docker-compose.full-demo.yml up --build --abort-on-container-exit
 ```
 
 > **Note:**
@@ -90,18 +90,21 @@ Now you can create a conversation between two users and send some messages. You 
 
 ```bash
 # Create a conversation between user 1 and user 2
-curl -d '{"participant_ids": [1, 2]}' -H "Content-Type: application/json" -X POST http://localhost:80/conversations
+curl -d '{"participant_ids": [1, 2]}' -H "Content-Type: application/json" -X POST "http://localhost/conversations"
 
 # User one sends a message to user two, user two gets notified
-curl -d '{"content": "This is the first message"}' -H "User-Id: 1" -H "Content-Type: application/json" -X POST 'http://localhost:80/conversations/1/messages'
+curl -d '{"content": "This is the first message"}' -H "User-Id: 1" -H "Content-Type: application/json" -X POST "http://localhost/conversations/1/messages"
 
 # User two sends a message to user one, user one gets notified
-curl -d '{"content": "This is the second message"}' -H "User-Id: 2" -H "Content-Type: application/json" -X POST 'http://localhost:80/conversations/1/messages'
+curl -d '{"content": "This is the second message"}' -H "User-Id: 2" -H "Content-Type: application/json" -X POST "http://localhost/conversations/1/messages"
 
 # See all the messages in the conversation
-curl -X GET http://localhost:80/conversations/1/messages
+curl -X GET "http://localhost/conversations/1/messages"
+```
 
-# Sample output
+Sample output:
+
+```bash
 {
   "messages": [
     {

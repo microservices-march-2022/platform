@@ -1,0 +1,43 @@
+upstream messenger_entrypoint {
+  server ${NGINX_UPSTREAM}:4000;
+}
+
+upstream health {
+  server localhost:4000;
+}
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://messenger_entrypoint;
+  }
+
+  location /health {
+    proxy_pass http://health;
+  }
+
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root /usr/share/nginx/html;
+  }
+}
+
+server {
+  listen 4000;
+
+  location / {
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+  }
+
+  location /health {
+    access_log off;
+    return 200 "OK\n";
+  }
+
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root /usr/share/nginx/html;
+  }
+}
