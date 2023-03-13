@@ -19,10 +19,10 @@ jobs:
         uses: azure/container-apps-deploy-action@v0
         with:
           appSourcePath: ${{ github.workspace }}/ingress # Location of Dockerfile
-          acrName: ${{ secrets.AZURE_PREFIX }}acr # Name of Azure Container Registry
-          containerAppName: ${{ secrets.AZURE_PREFIX }}containerapp # Name of Azure Container App
+          acrName: chri1356acr # Name of Azure Container Registry
+          containerAppName: chri1356containerapp # Name of Azure Container App
           resourceGroup: ${{ secrets.AZURE_RG }} # Name of Azure Resource Group
-          containerAppEnvironment: ${{ secrets.AZURE_PREFIX }}containerappenvironment
+          containerAppEnvironment: chri1356containerappenvironment
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
