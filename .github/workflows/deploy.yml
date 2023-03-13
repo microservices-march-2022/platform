@@ -22,6 +22,7 @@ jobs:
           acrName: ${{ secrets.AZURE_PREFIX }}acr # Name of Azure Container Registry
           containerAppName: ${{ secrets.AZURE_PREFIX }}containerapp # Name of Azure Container App
           resourceGroup: ${{ secrets.AZURE_RG }} # Name of Azure Resource Group
+          containerAppEnvironment: ${{ secrets.AZURE_PREFIX }}containerappenvironment
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
