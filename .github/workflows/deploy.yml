@@ -16,13 +16,15 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build and deploy Container App
-        uses: Azure/container-apps-deploy-action@41c1fee8501ac5ccdcfa85ed2a1ee7724e1bf31d
-        with:
-          appSourcePath: ${{ github.workspace }}/ingress
-          acrName: ${{ secrets.AZURE_PREFIX }}acr
-          resourceGroup: ${{ secrets.AZURE_RG }}
-          containerAppName: ${{ secrets.AZURE_PREFIX }}containerapp
-          containerAppEnvironment: ${{ secrets.AZURE_PREFIX }}containerappenvironment
+        run: |
+          # Enable extension installation
+          az config set extension.use_dynamic_install=yes_without_prompt
+          # Use Azure CLI to deploy update
+          az containerapp up -n ${{ secrets.AZURE_PREFIX }}containerappenvironment \
+            -g ${{ secrets.AZURE_RG }} \
+            --source ${{ github.workspace }}/ingress \
+            --environment ${{ secrets.AZURE_PREFIX }}containerappenvironment \
+            --registry-server ${{ secrets.AZURE_PREFIX }}acr.azurecr.io
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
