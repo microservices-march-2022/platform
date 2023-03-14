@@ -23,6 +23,8 @@ jobs:
           containerAppName: kari1235containerapp # Name of Azure Container App
           resourceGroup: ${{ secrets.AZURE_RG }} # Name of Azure Resource Group
           containerAppEnvironment: kari1235containerappenvironment
+          acrUsername: kari1235acr
+          acrPassword: qA7uzrwTZolKnQoKOeZYnvJ/zfGBDarGY9aOv1QpKL+ACRDj+VHw
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
