@@ -19,10 +19,10 @@ jobs:
         uses: azure/container-apps-deploy-action@v0
         with:
           appSourcePath: ${{ github.workspace }}/ingress
-          acrName: kari1236acr
+          acrName: ${{ secrets.AZURE_PREFIX }}acr
           resourceGroup: bicep-test
-          containerAppName: kari1236containerapp
-          containerAppEnvironment: kari1236containerappenvironment
+          containerAppName: ${{ secrets.AZURE_PREFIX }}containerapp
+          containerAppEnvironment: ${{ secrets.AZURE_PREFIX }}containerappenvironment
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
