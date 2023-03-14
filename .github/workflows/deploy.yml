@@ -16,7 +16,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v0
+        uses: Azure/container-apps-deploy-action@41c1fee8501ac5ccdcfa85ed2a1ee7724e1bf31d
         with:
           appSourcePath: ${{ github.workspace }}/ingress
           acrName: ${{ secrets.AZURE_PREFIX }}acr
