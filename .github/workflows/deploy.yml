@@ -20,7 +20,7 @@ jobs:
           # Enable extension installation
           az config set extension.use_dynamic_install=yes_without_prompt
           # Use Azure CLI to deploy update
-          az containerapp up -n ${{ secrets.AZURE_PREFIX }}containerappenvironment \
+          az containerapp up -n ${{ secrets.AZURE_PREFIX }}containerapp \
             -g ${{ secrets.AZURE_RG }} \
             --source ${{ github.workspace }}/ingress \
             --environment ${{ secrets.AZURE_PREFIX }}containerappenvironment \
