@@ -16,15 +16,9 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v0
-        with:
-          appSourcePath: ${{ github.workspace }}/ingress # Location of Dockerfile
-          acrName: kari1235acr # Name of Azure Container Registry
-          containerAppName: kari1235containerapp # Name of Azure Container App
-          resourceGroup: ${{ secrets.AZURE_RG }} # Name of Azure Resource Group
-          containerAppEnvironment: kari1235containerappenvironment
-          acrUsername: kari1235acr
-          acrPassword: qA7uzrwTZolKnQoKOeZYnvJ/zfGBDarGY9aOv1QpKL+ACRDj+VHw
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az containerapp up -n kari1235containerapp -g bicep-test --source ./ingress --registry-server kari1235acr.azurecr.io --environment kari1235containerappenvironment
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
