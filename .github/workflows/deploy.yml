@@ -20,7 +20,7 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }}/ingress
           acrName: ${{ secrets.AZURE_PREFIX }}acr
-          resourceGroup: bicep-test
+          resourceGroup: ${{ secrets.AZURE_RG }}
           containerAppName: ${{ secrets.AZURE_PREFIX }}containerapp
           containerAppEnvironment: ${{ secrets.AZURE_PREFIX }}containerappenvironment
   test-deployment:
