@@ -20,11 +20,10 @@ jobs:
           # Enable extension installation
           az config set extension.use_dynamic_install=yes_without_prompt
           # Use Azure CLI to deploy update
-          az containerapp up -n ${{ secrets.AZURE_PREFIX }}containerapp \
-            -g ${{ secrets.AZURE_RG }} \
-            --source ${{ github.workspace }}/ingress \
-            --environment ${{ secrets.AZURE_PREFIX }}containerappenvironment \
-            --registry-server ${{ secrets.AZURE_PREFIX }}acr.azurecr.io
+          az containerapp up -n ${{ secrets.CONTAINER_APP_NAME }} \
+             -g ${{ secrets.RESOURCE_GROUP }} \
+             --source ${{ github.workspace }}/ingress \
+             --registry-server ${{ secrets.ACR_NAME }}.azurecr.io
   test-deployment:
     needs: build-deploy
     runs-on: ubuntu-22.04
