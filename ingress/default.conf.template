@@ -33,7 +33,7 @@ server {
 
   location /health {
     access_log off;
-    return 500 "Change\n";
+    return 500 "not Lovinit at all!\n";
   }
 
   error_page 500 502 503 504 /50x.html;
