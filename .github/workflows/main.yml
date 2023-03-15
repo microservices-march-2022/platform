@@ -20,6 +20,8 @@ jobs:
      
       - name: Build and deploy Container 
         run: |
+          # Install azure containerapp
+          az extension add --name containerapp --upgrade
           # Enable extension installation
           az config set extension.use_dynamic_install=yes_without_prompt
           # Use Azure CLI to deploy update
