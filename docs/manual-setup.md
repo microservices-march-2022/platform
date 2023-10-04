@@ -37,7 +37,7 @@ docker-compose up -d
 3. Start the `messenger` service in a container:
 
    ```bash
-   docker run -d -p 4000:4000 --name messenger -e PGPASSWORD=postgres -e CREATE_DB_NAME=messenger -e PGHOST=messenger-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=4000 --network mm_2023 messenger
+   docker run -d --rm -p 4000:4000 --name messenger -e PGPASSWORD=postgres -e CREATE_DB_NAME=messenger -e PGHOST=messenger-db -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=4000 --network mm_2023 messenger
    ```
 
 4. SSH into the container to set up the PostgreSQL DB:
@@ -49,19 +49,19 @@ docker-compose up -d
 5. Create the PostgreSQL DB:
 
    ```bash
-   PGDATABASE=postgres node bin/create-db.mjs
+   PGDATABASE=postgres node scripts/create-db.mjs
    ```
 
 6. Create the PostgreSQL DB tables:
 
    ```bash
-   node bin/create-schema.mjs
+   node scripts/create-schema.mjs
    ```
 
 7. Create some PostgreSQL DB seed data:
 
    ```bash
-   node bin/create-seed-data.mjs
+   node scripts/create-seed-data.mjs
    ```
 
 ### Start the `notifier` Service
@@ -81,7 +81,7 @@ docker-compose up -d
 3. Start the `notifier` service in a container:
 
    ```bash
-   docker run -d -p 5000:5000 --name notifier -e PGPASSWORD=postgres -e CREATE_DB_NAME=notifier -e PGHOST=notifier-db-1 -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=5000 -e PGPORT=5433 --network mm_2023 notifier
+   docker run -d --rm -p 5000:5000 --name notifier -e PGPASSWORD=postgres -e CREATE_DB_NAME=notifier -e PGHOST=notifier-db -e AMQPHOST=rabbitmq -e AMQPPORT=5672 -e PORT=5000 -e PGPORT=5433 --network mm_2023 notifier
    ```
 
 4. SSH into the container to set up the PostgreSQL DB:
@@ -93,19 +93,19 @@ docker-compose up -d
 5. Create the PostgreSQL DB:
 
    ```bash
-   PGDATABASE=postgres node bin/create-db.mjs
+   PGDATABASE=postgres node scripts/create-db.mjs
    ```
 
 6. Create the PostgreSQL DB tables:
 
    ```bash
-   node bin/create-schema.mjs
+   node scripts/create-schema.mjs
    ```
 
 7. Create some PostgreSQL DB seed data:
 
    ```bash
-   node bin/create-seed-data.mjs
+   node scripts/create-seed-data.mjs
    ```
 
 ### Use the Service

@@ -83,7 +83,7 @@ docker-compose exec notifier node scripts/create-seed-data.mjs
 Start tailing the `notifier` logs to see notifications:
 
 ```bash
-docker-compose logs -f notifier
+docker-compose -f docker-compose.full-demo.yml logs -f notifier
 ```
 
 Now you can create a conversation between two users and send some messages. You should see information about the notifications going out in the notifier logs.
