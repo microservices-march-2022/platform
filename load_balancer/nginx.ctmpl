@@ -1,0 +1,15 @@
+upstream messenger_service {
+    {{- range service "messenger" }}
+    server {{ .Address }}:{{ .Port }};
+    {{- end }}
+}
+
+server {
+    listen 8085;
+    server_name localhost;
+
+    location / {
+        proxy_pass http://messenger_service;
+        add_header Upstream-Host $upstream_addr;
+    }
+}
